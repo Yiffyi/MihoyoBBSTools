@@ -2,9 +2,9 @@
 
 import os
 import time
-import signal
 import datetime
 from loghelper import log
+import runpy
 
 from crontab import CronTab
 from captcha import stop_inference_server, bring_up_inference_server
@@ -12,13 +12,7 @@ from captcha import stop_inference_server, bring_up_inference_server
 time_format = "%Y-%m-%d %H:%M:%S"
 
 
-def stop_me(_signo, _stack):
-    log.info("Docker container has stoped....")
-    exit(-1)
-
-
 def main():
-    signal.signal(signal.SIGINT, stop_me)
     log.info("使用DOCKER运行米游社签到")
     env = os.environ
     cron_signin = env["CRON_SIGNIN"]
@@ -38,9 +32,10 @@ def main():
         log.info("Starting signing")
         multi = env["MULTI"].upper()
         if multi == 'TRUE':
-            os.system("python3 ./main_multi.py autorun")
+            raise Exception('MULTI mode is unsupported in this branch')
+            # os.system("python3 ./main_multi.py autorun")
         else:
-            os.system("python3 ./main.py")
+            runpy.run_path('./main.py', run_name='__main__')
 
         stop_inference_server()
 
