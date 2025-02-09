@@ -1,3 +1,5 @@
+# Based on https://github.com/Womsxd/MihoyoBBSTools/blob/master/docker.py
+
 import os
 import time
 import signal
@@ -5,6 +7,7 @@ import datetime
 from loghelper import log
 
 from crontab import CronTab
+from captcha import stop_inference_server, bring_up_inference_server
 
 time_format = "%Y-%m-%d %H:%M:%S"
 
@@ -30,12 +33,16 @@ def main():
         log.info(f"Next run datetime: {nextruntime}")
 
     def sign():
+        bring_up_inference_server()
+
         log.info("Starting signing")
         multi = env["MULTI"].upper()
         if multi == 'TRUE':
             os.system("python3 ./main_multi.py autorun")
         else:
             os.system("python3 ./main.py")
+
+        stop_inference_server()
 
     sign()
     next_run_time()
